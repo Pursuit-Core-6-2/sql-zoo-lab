@@ -179,3 +179,24 @@ AND gdp/population >
    WHERE name = 'United Kingdom')
 
 -- 3
+SELECT name, continent 
+FROM world
+WHERE name =
+(SELECT name
+FROM world
+WHERE continent = 'Oceania'
+OR continent = 'South America')
+
+-- 4
+SELECT name, population
+FROM world
+WHERE population >
+(SELECT population
+FROM world
+WHERE name = 'Canada')
+AND <
+(SELECT population
+FROM world
+WHERE name = 'Poland')
+
+-- 5
