@@ -181,8 +181,8 @@ AND gdp/population >
 -- 3
 SELECT name, continent 
 FROM world
-WHERE name =
-(SELECT name
+WHERE continent IN
+(SELECT continent
 FROM world
 WHERE continent = 'Oceania'
 OR continent = 'South America')
@@ -194,9 +194,23 @@ WHERE population >
 (SELECT population
 FROM world
 WHERE name = 'Canada')
-AND <
+AND population <
 (SELECT population
 FROM world
 WHERE name = 'Poland')
 
 -- 5
+SELECT name, (population/population WHERE country = 'Germany' * 100 CONAT '%')
+FROM world
+WHERE continent = 'Europe'
+
+-- 6
+SELECT name
+FROM world
+WHERE gdp >
+ALL(SELECT name
+FROM world
+WHERE continent = 'Europe')
+
+-- 7
+
