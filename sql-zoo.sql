@@ -119,6 +119,9 @@ WHERE subject = 'literature'
     AND yr BETWEEN 1980 AND 1989
 
     --6
+    SELECT *
+FROM nobel
+WHERE winner IN ('Theodore Roosevelt',  'Woodrow Wilson', 'Jimmy Carter', 'Barack Obama')
 
     --7
 
