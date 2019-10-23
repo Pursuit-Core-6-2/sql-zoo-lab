@@ -251,3 +251,115 @@ SELECT mdate, teamname
  WHERE coach='Fernando Santos'
 
 --7
+SELECT player
+  FROM goal JOIN game ON (goal.matchid=game.id)
+ WHERE stadium='National Stadium, Warsaw'
+
+
+-- More JOIN operations
+
+--1
+SELECT id, title
+ FROM movie
+ WHERE yr=1962
+
+--2
+SELECT yr
+  FROM movie
+ WHERE title='Citizen Kane'
+
+--3
+SELECT id,title,yr
+  FROM movie
+ WHERE title LIKE ('%Star Trek%')
+
+--4
+SELECT id
+  FROM actor
+ WHERE name='Glenn Close'
+
+--5
+SELECT id
+  FROM movie
+ WHERE title='Casablanca'
+
+--6
+SELECT name
+  FROM actor JOIN casting ON (actor.id=casting.actorid)
+ WHERE movieid=11768
+
+--7
+SELECT name
+  FROM actor JOIN casting ON (actor.id=casting.actorid) JOIN movie ON (casting.movieid=movie.id)
+ WHERE title='Alien'
+
+--8
+SELECT title
+  FROM movie JOIN casting ON (movie.id = casting.movieid) JOIN actor ON (casting.actorid=actor.id)
+ WHERE name='Harrison Ford'
+
+--9
+SELECT title
+  FROM movie JOIN casting ON (movie.id = casting.movieid) JOIN actor ON (casting.actorid=actor.id)
+ WHERE name='Harrison Ford' AND ord<>1
+
+--10
+SELECT title, name
+  FROM movie JOIN casting ON (movie.id=casting.movieid) JOIN actor ON (casting.actorid=actor.id)
+ WHERE yr=1962 AND ord=1
+
+
+--Using NULL
+
+--1
+SELECT name
+  FROM teacher
+ WHERE dept IS NULL
+
+--2
+SELECT teacher.name, dept.name
+ FROM teacher INNER JOIN dept
+           ON (teacher.dept=dept.id)
+
+--3
+SELECT teacher.name, dept.name
+ FROM teacher LEFT OUTER JOIN dept
+           ON (teacher.dept=dept.id)
+
+--4
+SELECT teacher.name, dept.name
+ FROM teacher RIGHT OUTER JOIN dept
+           ON (teacher.dept=dept.id)
+
+--5
+SELECT name, COALESCE(mobile,'07986 444 2266') as mobile
+  FROM teacher
+
+--6
+SELECT teacher.name, COALESCE(dept.name,'None') as name
+  FROM teacher LEFT JOIN dept ON (teacher.dept=dept.id)
+
+--7
+SELECT COUNT(name), COUNT(mobile)
+  FROM teacher
+
+--8
+SELECT dept.name, COUNT(teacher.name)
+  FROM dept LEFT JOIN teacher ON (dept.id=teacher.dept)
+GROUP BY dept.name
+
+--9
+SELECT name, CASE WHEN (dept = 1) OR (dept = 2)
+                  THEN 'Sci'
+                  ELSE 'Art'
+             END
+  FROM teacher
+
+--10
+SELECT name, CASE WHEN (dept = 1) OR (dept = 2)
+                  THEN 'Sci'
+                  WHEN (dept = 1)
+                  THEN 'Art'
+                  ELSE 'None'
+             END
+  FROM teacher
