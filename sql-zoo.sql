@@ -186,6 +186,7 @@ WHERE continent IN
 FROM world
 WHERE continent = 'Oceania'
 OR continent = 'South America')
+ORDER BY name ASC
 
 -- 4
 SELECT name, population
