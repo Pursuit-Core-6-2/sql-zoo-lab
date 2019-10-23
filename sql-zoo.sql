@@ -346,7 +346,7 @@ WHERE gdp > ALL(
     WHERE continent = 'europe' AND gdp <> 'null'
 )
 
---7
+-- 7 (NEED TO REVIEW THAT)
 SELECT continent, name, area 
 FROM world x
 WHERE area >= ALL (
@@ -354,3 +354,391 @@ WHERE area >= ALL (
     FROM world y
     WHERE y.continent = x.continent
 )
+
+-- 8 (NEED TO REVIEW THAT)
+SELECT continent, name
+FROM world x
+WHERE name <= ALL (
+    SELECT name
+    FROM world y
+    WHERE y.continent=x.continent
+)
+
+
+-- Nested SELECT Quiz
+--1 Select the code that shows the name, region and population of the smallest country in each region
+SELECT region, name, population 
+FROM bbc x 
+WHERE population <= ALL (
+    SELECT population 
+    FROM bbc y 
+    WHERE y.region = x.region AND population > 0
+)
+
+--2 Select the code that shows the countries belonging to regions with all populations over 50000
+SELECT name,region,population 
+FROM bbc x 
+WHERE 50000 < ALL (
+    SELECT population 
+    FROM bbc y 
+    WHERE x.region = y.region AND y.population > 0
+)
+
+--3 Select the code that shows the countries with a less than a third of the population of the countries around it
+SELECT name, region 
+FROM bbc x
+WHERE population < ALL (
+    SELECT population/3 
+    FROM bbc y 
+    WHERE y.region = x.region AND y.name != x.name
+)
+
+-- 4
+SELECT name FROM bbc
+ WHERE population >
+       (SELECT population
+          FROM bbc
+         WHERE name='United Kingdom')
+   AND region IN
+       (SELECT region
+          FROM bbc
+         WHERE name = 'United Kingdom');
+--France
+--Germany
+--Russia
+--Turkey
+
+--5 Select the code that would show the countries with a greater GDP than any country in Africa 
+-- (some countries may have NULL gdp values).
+SELECT name 
+FROM bbc
+WHERE gdp > (
+    SELECT MAX(gdp) 
+    FROM bbc 
+    WHERE region = 'Africa'
+);
+
+--6 Select the code that shows the countries with population smaller than Russia but bigger than Denmark
+SELECT name 
+FROM bbc
+WHERE population < (
+    SELECT population 
+    FROM bbc 
+    WHERE name='Russia'
+) AND population > (
+    SELECT population 
+    FROM bbc 
+    WHERE name='Denmark'
+);
+
+--7 
+SELECT name 
+FROM bbc
+WHERE population > ALL (
+    SELECT MAX(population)
+    FROM bbc
+    WHERE region = 'Europe'
+) AND region = 'South Asia';
+--Bangladesh
+--India
+--Pakistan
+
+
+--////////////////////////////////////////////////////////////////
+-- SUM and COUNT
+--1
+SELECT SUM(population) All_population
+FROM world;
+
+--2
+SELECT DISTINCT continent
+FROM world;
+
+--3
+SELECT SUM(gdp) AfricaGDP
+FROM world
+WHERE continent = 'africa';
+
+--4
+SELECT COUNT(name) TotalCountires
+FROM world
+WHERE area >= 1000000;
+
+--5
+SELECT SUM(population) TotalPopulation
+FROM world
+WHERE name IN ('Estonia', 'Latvia', 'Lithuania');
+
+--6
+SELECT continent, COUNT(name) TotalCountries
+FROM world
+GROUP BY continent;
+
+--7
+SELECT continent, COUNT(name) TotalCountries
+FROM world
+WHERE population >= 10000000
+GROUP BY continent;
+
+--8
+SELECT continent
+FROM world
+GROUP BY continent
+HAVING SUM(population) > 100000000;
+
+-- QUIZ
+--1 Select the statement that shows the sum of population of all countries in 'Europe'
+SELECT SUM(population) 
+FROM bbc 
+WHERE region = 'Europe';
+
+--2 Select the statement that shows the number of countries with population smaller than 150000
+SELECT COUNT(name) 
+FROM bbc 
+WHERE population < 150000;
+
+--3 Select the list of core SQL aggregate functions 
+-- AVG(), COUNT(), MAX(), MIN(), SUM()
+
+--4
+SELECT region, SUM(area)
+FROM bbc 
+WHERE SUM(area) > 15000000 
+GROUP BY region;
+-- No result due to invalid use of the WHERE function
+
+--5 Select the statement that shows the average population of 'Poland', 'Germany' and 'Denmark'
+SELECT AVG(population) 
+FROM bbc 
+WHERE name IN ('Poland', 'Germany', 'Denmark');
+
+--6 Select the statement that shows the medium population density of each region
+SELECT region, SUM(population)/SUM(area) AS density 
+FROM bbc 
+GROUP BY region;
+
+--7  Select the statement that shows the name and population density of the country with the largest population
+SELECT name, population/area AS density 
+FROM bbc 
+WHERE population = (SELECT MAX(population) FROM bbc);
+
+--8 
+SELECT region, SUM(area) 
+FROM bbc 
+GROUP BY region 
+HAVING SUM(area)<= 20000000;
+-- Table-D
+-- Americas	732240
+-- Middle East	13403102
+-- South America	17740392
+-- South Asia	9437710
+
+
+-- ///////////////////////////////////////////////////////////////
+-- The JOIN operation
+--1
+SELECT matchid, player 
+FROM goal 
+WHERE teamid = (
+    SELECT id
+    FROM eteam
+    WHERE teamname = 'germany'
+);
+
+--2
+SELECT id,stadium,team1,team2
+FROM game
+WHERE id = 1012;
+
+--3
+SELECT player, teamid, stadium, mdate
+FROM game JOIN goal ON (game.id = goal.matchid)
+WHERE goal.teamid = (
+    SELECT id
+    FROM eteam
+    WHERE teamname = 'germany'
+);
+
+-- 4
+SELECT team1, team2, player
+FROM game JOIN goal ON (game.id = goal.matchid)
+WHERE player LIKE 'Mario%';
+
+--5
+SELECT player, teamid, coach, gtime
+FROM goal JOIN eteam ON (goal.teamid = eteam.id)
+WHERE gtime<=10
+
+--6
+SELECT mdate, teamname
+FROM game JOIN eteam ON (game.team1 = eteam.id)
+WHERE coach = 'Fernando Santos';
+
+--7
+SELECT player
+FROM game JOIN goal ON (game.id = goal.matchid)
+WHERE stadium = 'National Stadium, Warsaw';
+
+-- QUIZ
+--1 You want to find the stadium where player 'Dimitris Salpingidis' scored. Select the JOIN condition to use:
+game  JOIN goal ON (id=matchid);
+
+--2 You JOIN the tables goal and eteam in an SQL statement. Indicate the list of column names that may be used in the SELECT line:
+--matchid, teamid, player, gtime, id, teamname, coach
+
+--3 Select the code which shows players, their team and the amount of goals they scored against Greece(GRE).
+SELECT player, teamid, COUNT(*)
+FROM game JOIN goal ON matchid = id
+WHERE (team1 = "GRE" OR team2 = "GRE") AND teamid != 'GRE'
+GROUP BY player, teamid;
+
+--4 
+SELECT DISTINCT teamid, mdate
+FROM goal JOIN game on (matchid=id)
+WHERE mdate = '9 June 2012';
+--DEN	9 June 2012
+--GER	9 June 2012
+
+--5 Select the code which would show the player and their team for those who have scored against Poland(POL) in National Stadium, Warsaw.
+SELECT DISTINCT player, teamid 
+FROM game JOIN goal ON matchid = id 
+WHERE stadium = 'National Stadium, Warsaw' 
+    AND (team1 = 'POL' OR team2 = 'POL')
+    AND teamid != 'POL';
+
+--6 Select the code which shows the player, their team and the time they scored, 
+--for players who have played in Stadion Miejski (Wroclaw) but not against Italy(ITA).
+SELECT DISTINCT player, teamid, gtime
+FROM game JOIN goal ON matchid = id
+WHERE stadium = 'Stadion Miejski (Wroclaw)'
+    AND (( teamid = team2 AND team1 != 'ITA') 
+    OR ( teamid = team1 AND team2 != 'ITA'));
+
+-- 7
+SELECT teamname, COUNT(*)
+FROM eteam JOIN goal ON teamid = id
+GROUP BY teamname
+HAVING COUNT(*) < 3;
+-- Netherlands	2
+-- Poland	2
+-- Republic of Ireland	1
+-- Ukraine	2
+
+
+-- ///////////////////////////////////////////////////////////////
+-- More JOIN operations
+--1
+SELECT id, title
+FROM movie
+WHERE yr=1962;
+
+--2
+SELECT yr
+FROM movie
+WHERE title = 'Citizen Kane';
+
+--3
+SELECT id, title, yr
+FROM movie
+WHERE title LIKE '%star trek%'
+ORDER BY yr;
+
+--4
+SELECT id
+FROM actor
+WHERE name = 'glenn close';
+
+--5
+SELECT id
+FROM movie
+WHERE title = 'casablanca';
+
+--6
+SELECT name
+FROM actor 
+WHERE id IN (
+    SELECT actorid
+    FROM casting
+    WHERE movieid = (
+        SELECT id
+        FROM movie
+        WHERE title = 'casablanca'
+    )
+);
+--6
+SELECT name
+FROM actor JOIN casting ON (actor.id = casting.actorid)
+    JOIN movie ON (casting.movieid = movie.id)
+WHERE movie.title = 'casablanca';
+
+--7
+SELECT name
+FROM actor JOIN casting ON (actor.id = casting.actorid)
+    JOIN movie ON (casting.movieid = movie.id)
+WHERE movie.title = 'alien';
+
+--8
+SELECT title
+FROM movie JOIN casting ON (movie.id = casting.movieid)
+    JOIN actor ON (casting.actorid = actor.id)
+WHERE actor.name = 'harrison ford';
+
+--9
+SELECT title
+FROM movie JOIN casting ON (movie.id = casting.movieid)
+    JOIN actor ON (casting.actorid = actor.id)
+WHERE actor.name = 'harrison ford' AND casting.ord != 1;
+
+--10
+SELECT title, name
+FROM movie JOIN casting ON (movie.id = casting.movieid)
+    JOIN actor ON (casting.actorid = actor.id)
+WHERE yr=1962 AND ord = 1;
+
+-- QUIZ
+--1 Select the statement which lists the unfortunate directors of the movies which have caused financial loses (gross < budget)
+SELECT name
+FROM actor INNER JOIN movie ON actor.id = director
+WHERE gross < budget
+
+--2. Select the correct example of JOINing three tables
+SELECT *
+  FROM actor JOIN casting ON actor.id = actorid
+  JOIN movie ON movie.id = movieid;
+
+--3 Select the statement that shows the list of actors called 'John' by order of number of movies in which they acted
+SELECT name, COUNT(movieid)
+  FROM casting JOIN actor ON actorid=actor.id
+ WHERE name LIKE 'John %'
+ GROUP BY name ORDER BY 2 DESC;
+
+--4
+SELECT title 
+   FROM movie JOIN casting ON (movieid=movie.id)
+              JOIN actor   ON (actorid=actor.id)
+  WHERE name='Paul Hogan' AND ord = 1;
+--Table-B
+--"Crocodile" Dundee
+--Crocodile Dundee in Los Angeles
+--Flipper
+--Lightning Jack
+
+--5. Select the statement that lists all the actors that starred in movies directed by Ridley Scott who has id 351
+SELECT name
+FROM movie JOIN casting ON movie.id = actorid
+    JOIN actor ON actor.id = movieid
+WHERE ord = 1 AND director = 351
+
+--6. There are two sensible ways to connect movie and actor. They are:
+--link the director column in movies with the primary key in actor
+--connect the primary keys of movie and actor via the casting table
+
+
+--7
+ SELECT title, yr 
+   FROM movie, casting, actor 
+  WHERE name='Robert De Niro' AND movieid=movie.id AND actorid=actor.id AND ord = 3;
+--Table-B
+--A Bronx Tale	1993
+--Bang the Drum Slowly	1973
+--Limitless	2011
