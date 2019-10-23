@@ -73,3 +73,14 @@ SELECT name
  SELECT capital, name
  FROM world
 WHERE capital LIKE concat(name, '%')
+
+-- 14
+SELECT capital, name
+ FROM world
+WHERE capital <> name AND capital LIKE concat(name, '%')
+
+-- 15
+SELECT name,
+       REPLACE(capital, name, '')
+  FROM world
+WHERE capital <> name AND capital LIKE concat(name, '%')
