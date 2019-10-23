@@ -364,4 +364,97 @@ JOIN movie ON (movie.id = casting.movieid)
 WHERE yr = 1962
 AND ord = 1
 
--- 
+-- Busy years for Rock Hudson
+
+SELECT yr, COUNT(title) FROM
+  movie JOIN casting ON movie.id=movieid
+        JOIN actor   ON actorid=actor.id
+WHERE name='Rock Hudson'
+GROUP BY yr
+HAVING COUNT(title) > 2
+
+-- Lead actor in Julie Andrews movies
+
+SELECT title, actor.name
+FROM casting 
+JOIN movie ON (movieid = id)
+JOIN actor ON (actor.id = casting.actorid)
+WHERE 
+casting.ord = 1
+AND
+movie.id IN 
+(
+SELECT movieid FROM casting
+WHERE actorid IN 
+(
+  SELECT id FROM actor
+  WHERE name='Julie Andrews'
+)
+)
+
+-- SELECT movie.title, MIN(actor.name)
+-- FROM casting
+-- JOIN movie ON (movie.id = casting.movieid)
+-- JOIN actor ON (actor.id = casting.actorid)
+
+-- WHERE movie.id = ALL
+--    (SELECT movie.id FROM actor JOIN casting ON (casting.actorid = actor.id)
+--     WHERE casting.actorid = (SELECT name FROM actor WHERE name='Julie Andrews'))
+-- AND casting.ord = 1
+
+-- GROUP BY movie.title
+
+-- SELECT movie.title
+-- FROM casting
+-- JOIN movie ON (movie.id = casting.movieid)
+-- JOIN actor ON (actor.id = casting.actorid)
+
+-- WHERE movie.id = ALL
+-- (SELECT casting.movieid 
+-- FROM actor 
+-- JOIN casting ON (casting.actorid = actor.id)
+-- WHERE casting.actorid = 
+-- (SELECT id FROM actor WHERE name='Julie Andrews'))
+
+-- GROUP BY movie.title
+
+-- Actors with 30 leading roles
+
+SELECT actor.name
+FROM casting
+JOIN actor
+ON (casting.actorid = actor.id)
+WHERE casting.ord = 1
+
+GROUP BY actor.name
+HAVING COUNT(casting.actorid) >= 30
+ORDER BY COUNT(casting.actorid) DESC
+
+-- List the films released in the year 1978 ordered by the number of actors in the cast, then by title.
+
+SELECT title, COUNT(casting.actorid)
+FROM movie
+JOIN casting ON (movie.id = casting.movieid)
+WHERE yr = 1978
+GROUP BY movie.title
+ORDER BY COUNT(casting.actorid) DESC, title ASC
+
+-- List all the people who have worked with 'Art Garfunkel'.
+
+SELECT DISTINCT name
+FROM actor
+WHERE actor.id IN
+(
+SELECT actorid
+FROM casting
+WHERE movieid IN
+(
+SELECT movieid
+FROM casting
+WHERE casting.actorid = 
+    (SELECT id
+     FROM actor
+     WHERE name = 'Art Garfunkel')
+)
+)
+AND name <> 'Art Garfunkel'
