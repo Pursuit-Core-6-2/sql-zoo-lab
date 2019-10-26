@@ -24,7 +24,7 @@ WHERE name IN (
 
 -- 3
 SELECT name
-   ,area
+   , area
 FROM world
 WHERE area BETWEEN 200000
    AND 250000;
@@ -454,10 +454,65 @@ WHERE population / 3 >= ALL (
 --
 
 -- 1
+SELECT SUM(population)
+FROM world;
+
+-- 2
+SELECT DISTINCT continent
+FROM world;
+
+-- 3
+SELECT SUM(gdp)
+FROM world
+WHERE continent = 'Africa';
+
+-- 4
+SELECT COUNT(name)
+FROM world
+WHERE area > 1000000;
+
+-- 5
+SELECT SUM(population)
+FROM world
+WHERE name IN (
+      'Estonia'
+      , 'Latvia'
+      , 'Lithuania'
+      );
+
+-- 6
+SELECT continent
+   , COUNT(*)
+FROM world
+GROUP BY continent;
+
+-- 7
+SELECT continent
+   , COUNT(*)
+FROM world
+WHERE population > 10000000
+GROUP BY continent;
+
+-- 8
+SELECT continent
+FROM world
+GROUP BY continent
+HAVING SUM(population) > 100000000;
+
+
+-- -- -- 6 JOIN
+--
+
+-- 1
 -- 2
 -- 3
 -- 4
 -- 5
 -- 6
 -- 7
--- 8
+-- HARD 8
+-- HARD 9
+-- HARD 10
+-- HARD 11
+-- HARD 12
+-- HARD 13
