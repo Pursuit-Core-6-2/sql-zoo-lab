@@ -749,9 +749,123 @@ WHERE ord = 1 AND director = 351
 --1
 SELECt name
 FROM teacher
-WHERE dept IS NULL
+WHERE dept IS NULL;
 
 --2
 SELECT teacher.name, dept.name
 FROM teacher JOIN dept -- JOIN === INNER JOIN
-ON (teacher.dept=dept.id)
+ON (teacher.dept=dept.id);
+
+--3
+SELECT teacher.name, dept.name
+FROM teacher LEFT JOIN dept
+ON (teacher.dept=dept.id);
+
+--4
+SELECT teacher.name, dept.name
+FROM teacher RIGHT JOIN dept
+ON (teacher.dept=dept.id);
+
+--5
+SELECT name, COALESCE(mobile, '07986 444 2266') AS Mobile
+FROM teacher;
+
+--6
+SELECT teacher.name, COALESCE(dept.name, 'None') AS departement
+FROM teacher LEFT JOIN dept ON (teacher.dept = dept.id);
+
+--7
+SELECT COUNT(name) AS Teachers, COUNT(mobile) AS Mobiles
+FROM teacher;
+
+--8
+SELECT dept.name, COUNT(teacher.name) AS Staff
+FROM teacher RIGHT JOIN dept ON (dept.id = teacher.dept)
+GROUP BY dept.name;
+
+--9
+SELECT name, CASE 
+        WHEN dept IN ('1', '2') THEN 'Sci' 
+        ELSE 'Art' 
+    END AS Field
+FROM teacher;
+
+--10
+SELECT name, CASE 
+        WHEN dept IN ('1', '2') THEN 'Sci' 
+        WHEN dept = '3' THEN 'Art'
+        ELSE 'None' 
+    END AS Field
+FROM teacher;
+
+-- Using Null Quiz
+--1. Select the code which uses an outer join correctly.
+SELECT teacher.name, dept.name 
+FROM teacher LEFT OUTER JOIN dept ON (teacher.dept = dept.id);
+
+--2. Select the correct statement that shows the name of department which employs Cutflower 
+SELECT dept.name 
+FROM teacher JOIN dept ON (dept.id = teacher.dept) 
+WHERE teacher.name = 'Cutflower';
+
+--3. Select out of following the code which uses a JOIN to show a list of all the departments and number of employed teachers
+SELECT dept.name, COUNT(teacher.name) 
+FROM teacher RIGHT JOIN dept ON dept.id = teacher.dept 
+GROUP BY dept.name;
+
+--4. Using SELECT name, dept, COALESCE(dept, 0) AS result FROM teacher on teacher table will:
+-- display 0 in result column for all teachers without department
+
+--5
+SELECT name,
+    CASE WHEN phone = 2752 THEN 'two'
+        WHEN phone = 2753 THEN 'three'
+        WHEN phone = 2754 THEN 'four'
+    END AS digit
+FROM teacher
+-- 'four' for Throd
+
+--6
+SELECT name, 
+    CASE WHEN dept IN (1) THEN 'Computing' 
+        ELSE 'Other' 
+    END 
+FROM teacher;
+
+
+
+--////////////////////////////////////////////////////////////////
+--Self join
+--1
+SELECT COUNT (name) AS Total_Stops
+FROM stops;
+
+--2
+SELECT id
+FROM stops
+WHERE name = 'Craiglockhart';
+
+--3
+SELECT id, name
+FROM stops JOIN route ON stop = id
+WHERE num = '4' AND company = 'LRT';
+
+--4
+SELECT company, num, COUNT(*)
+FROM route WHERE stop=149 OR stop=53
+GROUP BY company, num
+HAVING COUNT(*) = 2;
+
+--5
+SELECT a.company, a.num, a.stop, b.stop
+FROM route a JOIN route b ON (a.company=b.company AND a.num=b.num)
+WHERE a.stop = 53 AND b.stop = 149;
+
+--6
+SELECT a.company, a.num, stopa.name, stopb.name
+FROM route a JOIN route b ON (a.company = b.company AND a.num = b.num)
+  JOIN stops stopa ON (a.stop = stopa.id)
+  JOIN stops stopb ON (b.stop = stopb.id)
+WHERE stopa.name = 'Craiglockhart' AND stopb.name = 'London Road';
+
+--7
