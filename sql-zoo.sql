@@ -742,3 +742,16 @@ WHERE ord = 1 AND director = 351
 --A Bronx Tale	1993
 --Bang the Drum Slowly	1973
 --Limitless	2011
+
+
+--////////////////////////////////////////////////////////////////
+-- Using Null
+--1
+SELECt name
+FROM teacher
+WHERE dept IS NULL
+
+--2
+SELECT teacher.name, dept.name
+FROM teacher JOIN dept -- JOIN === INNER JOIN
+ON (teacher.dept=dept.id)
