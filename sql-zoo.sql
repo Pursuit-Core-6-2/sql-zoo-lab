@@ -458,3 +458,136 @@ WHERE casting.actorid =
 )
 )
 AND name <> 'Art Garfunkel'
+
+-- Null
+
+-- 1
+SELECT name
+FROM teacher
+WHERE dept IS NULL
+
+-- 2
+SELECT teacher.name, dept.name
+   FROM teacher 
+       INNER JOIN dept
+           ON (teacher.dept=dept.id)
+
+-- 3
+SELECT teacher.name, dept.name
+FROM teacher 
+LEFT OUTER JOIN dept
+ON (teacher.dept = dept.id)
+
+-- 4
+SELECT teacher.name, dept.name
+FROM teacher
+RIGHT JOIN dept
+ON (teacher.dept = dept.id)
+
+-- 5
+SELECT name, COALESCE(mobile, '07986 444 2266')
+FROM teacher
+
+-- 6
+SELECT teacher.name, COALESCE(dept.name, 'None')
+FROM teacher
+LEFT JOIN dept
+ON (teacher.dept = dept.id)
+
+-- 7
+SELECT COUNT(name), COUNT(mobile)
+FROM teacher
+
+-- 8
+SELECT dept.name, COUNT(teacher.name)
+FROM teacher
+RIGHT JOIN dept
+ON (teacher.dept = dept.id)
+
+GROUP BY dept.name
+
+-- 9 
+SELECT teacher.name, 
+CASE WHEN teacher.dept = 1 OR teacher.dept = 2 THEN 'Sci' ELSE 'Art' END
+FROM teacher
+LEFT JOIN dept
+ON (teacher.dept = dept.id)
+
+-- 10
+SELECT teacher.name,
+CASE WHEN teacher.dept = 1 OR teacher.dept = 2 THEN 'Sci' WHEN teacher.dept = 3 THEN 'Art' ELSE 'None' END
+FROM teacher
+LEFT JOIN dept
+ON (teacher.dept = dept.id)
+
+-- SELF JOIN
+
+-- 1
+SELECT COUNT(*)
+FROM stops
+
+-- 2
+SELECT id
+FROM stops
+WHERE name = 'Craiglockhart'
+
+-- 3
+SELECT id, name
+FROM stops
+JOIN route ON (stops.id = route.stop)
+WHERE num = 4
+AND company = 'LRT'
+
+
+-- 4
+SELECT company, num, COUNT(*)
+FROM route WHERE stop=149 OR stop=53
+GROUP BY company, num
+HAVING COUNT(*) = 2
+
+-- 5
+SELECT a.company, a.num, a.stop, b.stop
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+WHERE a.stop=53
+AND b.stop = (SELECT id FROM stops WHERE name = 'London Road')
+
+-- 6
+SELECT a.company, a.num, stopa.name, stopb.name
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name='Craiglockhart'
+AND stopb.name = 'London Road'
+
+-- 7
+SELECT a.company, a.num
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name='Haymarket'
+AND stopb.name = 'Leith'
+GROUP BY a.company, a.num
+
+-- 8
+SELECT a.company, a.num
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name='Craiglockhart'
+AND stopb.name = 'Tollcross'
+GROUP BY a.company, a.num
+
+-- 9
+SELECT stopb.name, a.company, a.num
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name='Craiglockhart'
+
+-- 10
+-- PENDING
