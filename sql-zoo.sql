@@ -625,3 +625,133 @@ ORDER BY mdate ASC
    , matchid ASC
    , team1 ASC
    , team2 ASC;
+
+
+-- -- -- 7 More JOIN operations
+--
+
+-- 1
+SELECT id
+   , title
+FROM movie
+WHERE yr = 1962;
+
+-- 2
+SELECT yr
+FROM movie
+WHERE title = 'Citizen Kane';
+
+-- 3
+SELECT id
+   , title
+   , yr
+FROM movie
+WHERE title LIKE '%Star Trek%'
+ORDER BY yr ASC;
+
+-- 4
+SELECT id
+FROM actor
+WHERE name = 'Glenn Close';
+
+-- 5
+SELECT id
+FROM movie
+WHERE title = 'Casablanca';
+
+-- 6
+SELECT name
+FROM movie
+JOIN casting ON (movie.id = movieid)
+JOIN actor ON (casting.actorid = actor.id)
+WHERE title = 'Casablanca';
+
+-- 7
+SELECT name
+FROM movie
+JOIN casting ON (movie.id = movieid)
+JOIN actor ON (casting.actorid = actor.id)
+WHERE title = 'Alien';
+
+-- 8
+SELECT title
+FROM movie
+JOIN casting ON (movie.id = movieid)
+JOIN actor ON (casting.actorid = actor.id)
+WHERE name = 'Harrison Ford'; 
+
+-- 9
+SELECT title
+FROM movie
+JOIN casting ON (movie.id = movieid)
+JOIN actor ON (casting.actorid = actor.id)
+WHERE name = 'Harrison Ford'
+   AND ord <> 1;
+
+-- 10
+SELECT title
+   , name
+FROM movie
+JOIN casting ON (movie.id = movieid)
+JOIN actor ON (casting.actorid = actor.id)
+WHERE yr = 1962
+   AND ord = 1;
+
+-- HARDER 11
+SELECT yr
+   , COUNT(title)
+FROM movie
+JOIN casting ON (movie.id = movieid)
+JOIN actor ON (casting.actorid = actor.id)
+WHERE name = 'Rock Hudson'
+GROUP BY yr
+HAVING COUNT(title) > 2;
+
+-- HARDER 12
+SELECT title
+   , name
+FROM movie
+JOIN casting ON (movie.id = movieid)
+JOIN actor ON (casting.actorid = actor.id)
+WHERE movieid IN (
+      SELECT movieid
+      FROM actor
+      JOIN casting ON (id = actorid)
+      WHERE name = 'Julie Andrews'
+      )
+   AND ord = 1;
+
+-- HARDER 13
+SELECT DISTINCT name
+FROM actor
+JOIN casting ON (id = actorid)
+WHERE id IN (
+      SELECT actorid
+      FROM casting
+      WHERE ord = 1
+      GROUP BY actorid ASC
+      HAVING COUNT(*) >= 30
+      )
+ORDER BY name ASC;
+
+-- HARDER 14
+SELECT title
+   , COUNT(actorid)
+FROM movie
+JOIN casting ON (id = movieid)
+WHERE yr = 1978
+GROUP BY title
+ORDER BY COUNT(*) DESC
+   , title ASC;
+
+-- HARDER 15
+SELECT DISTINCT name
+FROM casting
+JOIN actor ON (actorid = id)
+WHERE movieid IN (
+      SELECT movieid
+      FROM casting
+      JOIN actor ON (actorid = id)
+      WHERE name = 'Art Garfunkel'
+      )
+   AND name <> 'Art Garfunkel';
