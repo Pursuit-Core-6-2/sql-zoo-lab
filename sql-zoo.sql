@@ -837,10 +837,133 @@ FROM teacher;
 --
 
 -- 1
+SELECT A_STRONGLY_AGREE
+FROM nss
+WHERE question = 'Q01'
+   AND institution='Edinburgh Napier University'
+   AND subject='(8) Computer Science';
+
 -- 2
+SELECT institution
+   , subject
+FROM nss
+WHERE question = 'Q15'
+   AND score >= 100;
+
 -- 3
+SELECT institution
+   , score
+FROM nss
+WHERE question = 'Q15'
+   AND subject = '(8) Computer Science'
+   AND score < 50
+
+
 -- 4
+SELECT subject
+   , SUM(response)
+FROM nss
+WHERE question = 'Q22'
+   AND subject IN (
+      '(8) Computer Science'
+      , '(H) Creative Arts and Design'
+      )
+GROUP BY subject;
+
 -- 5
+SELECT subject
+   , SUM(response * A_STRONGLY_AGREE / 100)
+FROM nss
+WHERE question='Q22'
+   AND subject IN (
+      '(8) Computer Science'
+      , '(H) Creative Arts and Design'
+      );
+
+-- 6
+SELECT subject
+   , ROUND(SUM(response * A_STRONGLY_AGREE / 100) / SUM(response) * 100, 0)
+FROM nss
+WHERE question = 'Q22'
+   AND subject IN (
+      '(8) Computer Science'
+      , '(H) Creative Arts and Design'
+      )
+GROUP BY subject;
+
+-- 7
+SELECT institution
+   , ROUND(AVG(score), 0)
+FROM nss
+WHERE question = 'Q22'
+   AND institution LIKE '%Manchester%'
+GROUP BY institution;
+
+-- 8
+SELECT institution
+   , SUM(sample)
+   , (
+      SELECT sample
+      FROM nss y
+      WHERE subject = '(8) Computer Science'
+         AND x.institution = y.institution
+         AND question = 'Q01'
+      ) AS comp
+FROM nss x
+WHERE question = 'Q01'
+   AND (institution LIKE '%Manchester%')
+GROUP BY institution;
+
+
+-- -- -- 9 Self join
+--
+
+-- 1
+SELECT COUNT(*)
+FROM stops;
+
+-- 2
+SELECT id
+FROM stops
+WHERE name = 'Craiglockhart';
+
+-- 3
+SELECT id
+   , name
+FROM route
+JOIN stops ON (id = stop)
+WHERE num = '4'
+   AND company = 'LRT';
+
+-- 4
+SELECT company
+   , num
+   , COUNT(*)
+FROM route
+WHERE stop IN (
+   149
+   , 53
+   )
+GROUP BY company
+   , num
+HAVING COUNT(*) = 2;
+
+-- 5
+SELECT a.company
+   , a.num
+   , a.stop
+   , b.stop
+FROM route a
+JOIN route b ON (
+      a.company = b.company
+      AND a.num = b.num
+      )
+WHERE a.stop = 53
+   AND b.stop = 149;
+
 -- 6
 -- 7
 -- 8
+-- 9
+-- 10
+
